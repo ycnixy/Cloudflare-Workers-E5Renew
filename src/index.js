@@ -12,6 +12,8 @@ const MS_GRAPH_API_LIST = [
   `${MS_GRAPH_ROOT}/v${MS_GRAPH_VER}/me/mailFolders/inbox`,
   `${MS_GRAPH_ROOT}/v${MS_GRAPH_VER}/me/messages`,
 ];
+// @Note
+var message;
 
 addEventListener("fetch", (event) => {
   event.respondWith(
@@ -37,12 +39,17 @@ async function handleRequest(request) {
   const { pathname } = new URL(request.url);
 
   if (typeof CRON_PATH !== "undefined" && pathname.startsWith(CRON_PATH)) {
-    await sendMessage("Scheduled start");
+    //await sendMessage("Scheduled start");
+    // @Note
+    message += "Scheduled start\n";
     for (let i = 0; i < MS_GRAPH_API_LIST.length; i++) {
       await fetchMSApi(MS_GRAPH_API_LIST[i]);
       await sleep(randomInt(1000, 5000));
     }
-    await sendMessage("Scheduled finish");
+    //await sendMessage("Scheduled finish");
+    // @Note
+    message += "Scheduled finish\n";
+    await sendMessage(message);
   }
 
   if (await Token.get("refresh_token") !== null) {
@@ -61,13 +68,19 @@ async function handleRequest(request) {
 }
 
 async function handleScheduled(event) {
-  await sendMessage("Scheduled start");
+  //await sendMessage("Scheduled start");
+  // @Note
+  message += "Scheduled start\n";
   const count = randomInt(2, 10);
   for (let i = 0; i < count; i++) {
     await randomFetchMSApi();
     await sleep(randomInt(1000, 5000));
   }
-  await sendMessage("Scheduled finish");
+  //await sendMessage("Scheduled finish");
+  // @Note
+  message += "Scheduled finish\n";
+  await sendMessage(message);
+  
 }
 
 async function sendMessage(message) {
@@ -217,10 +230,14 @@ async function fetchMSApi(url) {
     if (response.status === 401) {
       Token.delete("access_token");
     }
-    sendMessage(url + ": " + response.statusText);
+    //sendMessage(url + ": " + response.statusText);
+    // @Note
+    message += url + ": " + response.statusText + "\n";
   }
   catch (e) {
-    sendMessage(url + ": " + e.message);
+    //sendMessage(url + ": " + e.message;
+    // @Note
+    message += url + ": " + e.message + "\n";
   }
 }
 
